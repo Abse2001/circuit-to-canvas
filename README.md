@@ -14,16 +14,10 @@ drawer.configure({
   }
 })
 
-drawer.drawElement(pcbPlatedHole, {
+// Accepts a circuit json array, by default draws on all layers
+drawer.drawElements([pcbPlatedHole], {
   layers: ["top_copper"]
 })
-
-
-
-drawer.drawCopper(circuitJsonArray, { layers: ["top"] })
-
-// Draws all layers by default, soldermask etc.
-drawer.drawCircuitJson(circuitJsonArray)
 ```
 
 ## Implementation Notes
