@@ -2,6 +2,8 @@
 
 Draw [Circuit JSON](https://github.com/tscircuit/circuit-json) into a Canvas- works with any canvas object (Node/Vanilla)
 
+[![NPM Version](https://img.shields.io/npm/v/circuit-to-canvas)](https://npmjs.com/package/circuit-to-canvas)
+
 ```tsx
 const drawer = new CircuitToCanvasDrawer(canvasOrCanvasRenderingContext2d)
 
