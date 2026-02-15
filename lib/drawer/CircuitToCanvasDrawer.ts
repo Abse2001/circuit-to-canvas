@@ -130,6 +130,10 @@ export class CircuitToCanvasDrawer {
           ...this.colorMap.copper,
           ...config.colorOverrides.copper,
         },
+        copperPour: {
+          ...this.colorMap.copperPour,
+          ...config.colorOverrides.copperPour,
+        },
         silkscreen: {
           ...this.colorMap.silkscreen,
           ...config.colorOverrides.silkscreen,
@@ -232,7 +236,21 @@ export class CircuitToCanvasDrawer {
       })
     }
 
-    // Step 2: Draw copper elements underneath soldermask (pads, copper text)
+    // Step 2: Draw copper pours first so pads render on top of pours.
+    for (const element of elements) {
+      if (!shouldDrawElement(element, options)) continue
+
+      if (element.type === "pcb_copper_pour") {
+        drawPcbCopperPour({
+          ctx: this.ctx,
+          pour: element as PcbCopperPour,
+          realToCanvasMat: this.realToCanvasMat,
+          colorMap: this.colorMap,
+        })
+      }
+    }
+
+    // Step 3: Draw copper elements underneath soldermask (pads, copper text)
     for (const element of elements) {
       if (!shouldDrawElement(element, options)) continue
 
@@ -255,8 +273,21 @@ export class CircuitToCanvasDrawer {
       }
     }
 
-    // Draw holes/plated holes/vias before soldermask so mask is rendered on top.
+    // Draw traces before drills, then drills before soldermask so mask is rendered on top.
     if (renderTopSoldermask) {
+      for (const element of elements) {
+        if (!shouldDrawElement(element, options)) continue
+
+        if (element.type === "pcb_trace") {
+          drawPcbTrace({
+            ctx: this.ctx,
+            trace: element as PcbTrace,
+            realToCanvasMat: this.realToCanvasMat,
+            colorMap: this.colorMap,
+          })
+        }
+      }
+
       for (const element of elements) {
         if (!shouldDrawElement(element, options)) continue
 
@@ -377,21 +408,6 @@ export class CircuitToCanvasDrawer {
     // Step 6: Draw copper pour and traces (on top of soldermask and silkscreen)
     for (const element of elements) {
       if (!shouldDrawElement(element, options)) continue
-
-      if (element.type === "pcb_copper_pour") {
-        const pourLayer = (element as PcbCopperPour).layer
-        const coveredByRenderedSoldermask =
-          (pourLayer === "top" && renderTopSoldermask) ||
-          (pourLayer === "bottom" && renderBottomSoldermask)
-        if (coveredByRenderedSoldermask) continue
-
-        drawPcbCopperPour({
-          ctx: this.ctx,
-          pour: element as PcbCopperPour,
-          realToCanvasMat: this.realToCanvasMat,
-          colorMap: this.colorMap,
-        })
-      }
 
       if (element.type === "pcb_trace" && !renderTopSoldermask) {
         drawPcbTrace({
