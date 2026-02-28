@@ -5,6 +5,7 @@ import type {
   PcbCopperPour,
   PcbCopperText,
   PcbCourtyardCircle,
+  PcbCourtyardOutline,
   PcbCourtyardRect,
   PcbCutout,
   PcbFabricationNoteDimension,
@@ -607,7 +608,7 @@ export class CircuitToCanvasDrawer {
       if (element.type === "pcb_courtyard_outline") {
         drawPcbCourtyardOutline({
           ctx: this.ctx,
-          outline: element as any,
+          outline: element as PcbCourtyardOutline,
           realToCanvasMat: this.realToCanvasMat,
           colorMap: this.colorMap,
         })
